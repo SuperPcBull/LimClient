@@ -67,11 +67,10 @@ add_library(json_static STATIC ${Json_src_list})
 add_library(FTAPI_pb_static STATIC ${FTAPI_pb_src_list})
 
 #主程序
-add_library(lim_client ${App_src_list})
+add_executable(lim_client ${App_src_list})
 
 target_link_libraries(
         lim_client
-        app_static
         json_static
         zltoolkit_static
         ${LINK_LIB_LIST}
