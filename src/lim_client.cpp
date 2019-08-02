@@ -92,19 +92,15 @@ int main(int argc, char *argv[]) {
             cout << ex.what() << endl;
             return -1;
         }
+
         LogLevel logLevel = (LogLevel) cmd_main["level"].as<int>();
         logLevel = std::min(std::max(logLevel, LTrace), LError);
         int threads = cmd_main["threads"];
+        string name = cmd_main["user"];
+        string pwd = cmd_main["pwd"];
 
         //设置日志
         Logger::Instance().add(std::make_shared<ConsoleChannel>("ConsoleChannel", logLevel));
-#if defined(__linux__) || defined(__linux)
-        Logger::Instance().add(std::make_shared<SysLogChannel>("SysLogChannel",logLevel));
-#else
-        Logger::Instance().add(std::make_shared<FileChannel>("FileChannel", exePath() + ".log", logLevel));
-#endif
-
-        //执行到这里代表是子进程
         Logger::Instance().setWriter(std::make_shared<AsyncLogWriter>());
 
         //加载配置文件，如果配置文件不存在就创建一个
@@ -114,8 +110,6 @@ int main(int argc, char *argv[]) {
         WorkThreadPool::Instance().setPoolSize(threads);
         EventPollerPool::setPoolSize(threads);
 
-        auto name = cmd_main["user"];
-        auto pwd = cmd_main["pwd"];
         static atomic_int push_count(0);
         LimClient::Ptr client = std::make_shared<LimClient>();
         DebugL << "开始登陆: " << name << " " << pwd;
